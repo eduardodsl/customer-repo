@@ -3,8 +3,11 @@ package br.com.dsleite.customerrepo.service.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import br.com.dsleite.customerrepo.exceptions.AddressNotFoundException;
+import br.com.dsleite.customerrepo.exceptions.DataNotFoundException;
 import br.com.dsleite.customerrepo.model.Address;
 import br.com.dsleite.customerrepo.model.AddressRepository;
 import br.com.dsleite.customerrepo.model.Customer;
@@ -34,12 +37,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void insert(Customer customer){
+    public void insert(Customer customer) throws AddressNotFoundException {
         saveCustomerWithCEP(customer);
     }
 
     @Override
-    public Customer insert(String name, String surname, String cep){
+    public Customer insert(String name, String surname, String cep) throws AddressNotFoundException {
         Customer customer = new Customer();
         customer.setFullName(name, surname);
         Address address = new Address();
@@ -50,15 +53,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void update(Long id, Customer update){
+    public void update(Long id, Customer update) throws AddressNotFoundException, DataNotFoundException {
         Optional<Customer> customer = customerRepository.findById(id);
         if(customer.isPresent()){
             saveCustomerWithCEP(update);
+        }else{
+            throw new DataNotFoundException("Customer id "+id+" not found");
         }
     }
 
     @Override
-    public Customer update(Long id, String name, String surname, String cep){
+    public Customer update(Long id, String name, String surname, String cep) throws AddressNotFoundException {
 
         Optional<Customer> customer = customerRepository.findById(id);
         if(customer.isPresent()){
@@ -77,19 +82,27 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void delete(Long id){
-        customerRepository.deleteById(id);
+    public void delete(Long id) throws DataNotFoundException {
+        try {
+            customerRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e){
+            throw new DataNotFoundException("Customer with id "+id+" not found");
+        }
     }
 
-    private void saveCustomerWithCEP(Customer customer){
+    private void saveCustomerWithCEP(Customer customer) throws AddressNotFoundException {
         String cep = customer.getAddress().getCep();
-        Address address = addressRepository.findById(cep).orElseGet(() -> {
-            Address newAddress = viaCepService.findCEP(cep);
-            addressRepository.save(newAddress);
-            return newAddress;
-        });
-        customer.setAddress(address);
-        customerRepository.save(customer);
+        try {
+            Address address = addressRepository.findById(cep).orElseGet(() -> {
+                Address newAddress = viaCepService.findCEP(cep);
+                addressRepository.save(newAddress);
+                return newAddress;
+            });
+            customer.setAddress(address);
+            customerRepository.save(customer);
+        } catch (Exception e){
+            throw new AddressNotFoundException("The CEP address ["+cep+"] is not valid");
+        }
     }
 
 }
