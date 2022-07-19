@@ -13,18 +13,18 @@ const CustomerForm = () => {
     const [ addressStatus, setAddressStatus ] = useState(ADDRESS_UNAVAILABLE);
     
     let customerData = {
-        id: null,
-        name: '',
-        surname: '',
-        cep: '',
+        id: { valid: true, value: null },
+        name: { valid: true, value: '' },
+        surname: { valid: true, value: '' },
+        cep: { valid: true, value: '' },
     };
     
     useEffect(() => {
         if(currentCustomer.getId){
-            customerData.id = currentCustomer.getId();
-            customerData.name = currentCustomer.getName();
-            customerData.surname = currentCustomer.getSurname();
-            customerData.cep = currentCustomer.getCep();
+            customerData.id.value = currentCustomer.getId();
+            customerData.name.value = currentCustomer.getName();
+            customerData.surname.value = currentCustomer.getSurname();
+            customerData.cep.value = currentCustomer.getCep();
             updateAddress(currentCustomer.getAddress());
             setAddressStatus(ADDRESS_FOUND);
             updateForm({...customerData});
@@ -33,24 +33,37 @@ const CustomerForm = () => {
     
     const [form, updateForm] = useState(customerData);
     
-    const onSubmit = (e) => {
-        if(form.id){
-            editCustomer(form.id, form.name, form.surname, form.cep);
-        }else{
-            addCustomer(form.name, form.surname, form.cep);
+    const checkInvalidForm = (result) => {
+        if(result.empty.length){
+            result.empty.forEach(el => {
+                form[el].valid = false;
+            });
         }
+    }
+
+    const onSubmit = async (e) => {
         e.preventDefault();
+        let result = { success: false };
+        if(form.id.value){
+            result = await editCustomer(form.id.value, form.name.value, form.surname.value, form.cep.value);
+        }else{
+            result = await addCustomer(form.name.value, form.surname.value, form.cep.value);
+        }
+        if(!result.success){
+            checkInvalidForm(result);
+            updateForm( {...form} );
+        }
     }
 
     const cancelEdit = (e) => {
-        updateForm(customerData);
         e.preventDefault();
+        updateForm(customerData);
     }
 
     const setForm = (e) => {
         const val = e.target.value;
         const newForm = { ...form };
-        newForm[e.target.name] = val;
+        newForm[e.target.name].value = val;
         updateForm(newForm);
     }
 
@@ -74,7 +87,7 @@ const CustomerForm = () => {
     }
 
     const SubmitButton = () => {
-        if(form.id){
+        if(form.id.value){
             return (
                 <>
                     <input type="submit" value="edit customer" />
@@ -105,15 +118,15 @@ const CustomerForm = () => {
             <form onSubmit={onSubmit}>
                 <label>
                     Name:
-                    <input type="text" name="name" value={form.name} onChange={setForm} />
+                    <input type="text" name="name" className={ !form.name.valid ? 'invalid' : '' } value={form.name.value} onChange={setForm} />
                 </label>
                 <label>
                     Surname:
-                    <input type="text" name="surname" value={form.surname} onChange={setForm} />
+                    <input type="text" name="surname" className={ !form.surname.valid ? 'invalid' : '' } value={form.surname.value} onChange={setForm} />
                 </label>
                 <label>
                     CEP:
-                    <input type="text" name="cep" value={form.cep} onBlur={searchCep}  onKeyUp={searchCep} onChange={setForm} />
+                    <input type="text" name="cep" className={ !form.cep.valid ? 'invalid' : '' } value={form.cep.value} onBlur={searchCep}  onKeyUp={searchCep} onChange={setForm} />
                 </label>
                 <SubmitButton />
             </form>

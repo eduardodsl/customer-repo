@@ -70,8 +70,14 @@ const CustomerService = ({children}) => {
         data.append('name', name);
         data.append('surname', surname);
         data.append('cep', cep);
-        await postJson(`${DEFAULT_URL}/customers/`, data);
-        loadCustomers();
+        const result = await postJson(`${DEFAULT_URL}/customers/`, data);
+        console.log(result);
+        if(result.success){
+            loadCustomers();
+            return result;
+        }else{
+            return result;
+        }
     }
 
     const editCustomer = async (id, name, surname, cep) => {
@@ -104,7 +110,7 @@ const CustomerService = ({children}) => {
                 return customerList;
             }
         } catch(e){
-            console.error(e);
+            console.info("it wasn't possible to request customers");
         }
 
     }
