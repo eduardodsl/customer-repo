@@ -71,7 +71,6 @@ const CustomerService = ({children}) => {
         data.append('surname', surname);
         data.append('cep', cep);
         const result = await postJson(`${DEFAULT_URL}/customers/`, data);
-        console.log(result);
         if(result.success){
             loadCustomers();
             return result;
@@ -86,8 +85,13 @@ const CustomerService = ({children}) => {
         data.append('name', name);
         data.append('surname', surname);
         data.append('cep', cep);
-        await putJson(`${DEFAULT_URL}/customers/${id}`, data);
-        loadCustomers();
+        const result = await putJson(`${DEFAULT_URL}/customers/${id}`, data);
+        if(result.success){
+            loadCustomers();
+            return result;
+        }else{
+            return result;
+        }
     }
 
     const deleteCustomer = async(id) => {
@@ -108,6 +112,9 @@ const CustomerService = ({children}) => {
                 });
                 setCustomerList(customers);
                 return customerList;
+            }else{
+                setCustomerList([]);
+                return [];
             }
         } catch(e){
             console.info("it wasn't possible to request customers");

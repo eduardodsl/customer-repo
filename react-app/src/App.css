@@ -6,3 +6,88 @@ body{
 input.invalid {
   border: 1px solid red;
 }
+
+form label, form .buttons{
+  flex-grow: 1;
+  display: block;
+}
+
+form label input{
+  display: block;
+  width: 100%;
+}
+
+form .buttons input{
+  width: 100%;
+}
+
+form .buttons input:first-child{
+  margin-top: auto;
+}
+
+input, button {
+  box-sizing: border-box;
+  border: 1px solid #CCC;
+  padding: 5px;
+}
+
+input[type=submit],
+input[type=button],
+button{
+  cursor: pointer;
+}
+
+.layout{
+  padding: 5px 20px;
+}
+
+.customer .data{
+  display: flex;
+}
+
+.customer .data .name{
+  flex-grow: 1;
+  padding: 5px;
+}
+
+.customer .address{
+  background-color: rgb(243, 243, 243);
+  padding: 5px;
+  font-style: italic;
+  border-bottom: 1px solid #CCC;
+}
+
+@media (min-width: 600px){
+  form{
+    display: flex;
+  }
+  .customer .data button{
+    width: 78px;
+  }
+  form label,
+  form .buttons{
+    display: flex;
+    flex-direction: column;
+  }
+  form label span{
+    display: block;
+    margin-top: auto;
+  } 
+}
+
+@media (min-width: 1000px){
+  .layout{
+    margin: auto;
+    width: 800px;
+  }
+}
+
+footer {
+  text-align: center;
+}
+
+ul, li {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}

@@ -37,7 +37,7 @@ public class ResponseUtils {
     public static Map<String, Object> baseResponse(String message, boolean success){
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("message", message);
-        map.put("success", false);
+        map.put("success", success);
         return map;
     }
 

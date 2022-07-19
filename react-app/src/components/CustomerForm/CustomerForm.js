@@ -57,6 +57,8 @@ const CustomerForm = () => {
 
     const cancelEdit = (e) => {
         e.preventDefault();
+        updateAddress({});
+        setAddressStatus(ADDRESS_UNAVAILABLE);
         updateForm(customerData);
     }
 
@@ -89,13 +91,17 @@ const CustomerForm = () => {
     const SubmitButton = () => {
         if(form.id.value){
             return (
-                <>
-                    <input type="submit" value="edit customer" />
-                    <input type="button" value="cancel" onClick={cancelEdit} />
-                </>
+                <div className="buttons">
+                    <input className="submit" type="submit" value="edit customer" />
+                    <input className="cancel" type="button" value="cancel" onClick={cancelEdit} />
+                </div>
             );
         }
-        return (<input type="submit" value="new customer" />);
+        return (
+            <div className="buttons">
+                <input className="submit" type="submit" value="new customer" />
+            </div>
+        );
     }
 
     const AddressInfo = () => {
@@ -114,23 +120,25 @@ const CustomerForm = () => {
     }
 
     return (
-        <section>
-            <form onSubmit={onSubmit}>
-                <label>
-                    Name:
-                    <input type="text" name="name" className={ !form.name.valid ? 'invalid' : '' } value={form.name.value} onChange={setForm} />
-                </label>
-                <label>
-                    Surname:
-                    <input type="text" name="surname" className={ !form.surname.valid ? 'invalid' : '' } value={form.surname.value} onChange={setForm} />
-                </label>
-                <label>
-                    CEP:
-                    <input type="text" name="cep" className={ !form.cep.valid ? 'invalid' : '' } value={form.cep.value} onBlur={searchCep}  onKeyUp={searchCep} onChange={setForm} />
-                </label>
-                <SubmitButton />
-            </form>
-            <AddressInfo />
+        <section id="customer-form">
+            <div className="layout">
+                <form onSubmit={onSubmit}>
+                    <label>
+                        <span>Name:</span>
+                        <input type="text" name="name" className={ !form.name.valid ? 'invalid' : '' } value={form.name.value} onChange={setForm} />
+                    </label>
+                    <label>
+                        <span>Surname:</span>
+                        <input type="text" name="surname" className={ !form.surname.valid ? 'invalid' : '' } value={form.surname.value} onChange={setForm} />
+                    </label>
+                    <label>
+                        <span>CEP:</span>
+                        <input type="text" name="cep" className={ !form.cep.valid ? 'invalid' : '' } value={form.cep.value} onBlur={searchCep}  onKeyUp={searchCep} onChange={setForm} />
+                    </label>
+                    <SubmitButton />
+                </form>
+                <AddressInfo />
+            </div>
         </section>
     );
 
